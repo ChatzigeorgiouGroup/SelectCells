@@ -129,6 +129,7 @@ class Clicker:
         if event.key == "r":
             self.locations = {}
             self.image = self.original
+            self.cell_number = 1
             self.update()
         if event.key == "1":
             self.image = filters.gaussian(self.image, sigma = 1)
