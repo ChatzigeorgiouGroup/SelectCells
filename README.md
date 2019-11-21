@@ -5,7 +5,7 @@ A python application to annotate Notochord cell locations
 
 ```
 import SelectApp
-SelectApp()
+SelectApp(path = "/path/to/tiff/files")
 ```
 
 ### controls
