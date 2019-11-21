@@ -12,6 +12,7 @@ import glob
 import os
 from skimage import filters
 from skimage import exposure
+import pandas as pd
 
 class SelectApp:
     def __init__(self, path = "./"):
@@ -22,9 +23,10 @@ class SelectApp:
         self.result_dir = os.path.join(self.path, "cell_locations")
         self.images = self.get_images(self.path)
         if len(self.images)>0:
+            print(f"Found {len(self.images)} to annotate\n")
             self.select_cells()
         else:
-            print("No valid files in path")
+            print("\nNo valid files in path")
         
 
     def get_images(self, path = "./"):
@@ -56,8 +58,8 @@ class SelectApp:
         if not os.path.exists(self.savedir):
             os.mkdir(self.savedir)
         fig.savefig(os.path.join(self.savedir, "locations.png"))
-        locations = np.vstack(locations)
-        np.save(os.path.join(self.savedir, "locations.npy"), locations)
+        df = pd.DataFrame.from_dict(locations, columns = ["x", "y"], orient = "index")
+        df.to_csv(os.path.join(self.savedir, "locations.txt"), sep = "\t")
         print(f"saved results to {self.savedir}")
 
 class Clicker:
@@ -149,5 +151,6 @@ class Clicker:
             self.update()
 
 if __name__ == "__main__":
-   SelectApp()
+    path = input("Path to tiffs:")
+    app = SelectApp(path)
 

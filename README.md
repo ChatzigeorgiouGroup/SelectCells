@@ -8,10 +8,17 @@ import SelectApp
 SelectApp(path = "/path/to/tiff/files")
 ```
 
+or run
+
+```
+python3 SelectApp.py
+```
+although on some installations this results in an event-loop error.
+
 ### controls
 * `left click` adds a location.
 * `right click` removes a location
-* <kbd>enter</kbd> saves the results to ./cell_locations/{filename}/ where it will place the image as a png and the locations as a pickled dictionary.
+* <kbd>enter</kbd> saves the results to ./cell_locations/{filename}/ where it will place the image as a png and the locations as a tab-delimited textfile.
 * <kbd>left</kbd> and <kbd>right</kbd> open next/previous images from the loaded list
 * <kbd>+</kbd> and <kbd>-</kbd> increment and decrement the cell number so that you can skip numbers you are unsure about and annotate the cells with exactly the numbers you want.
 * <kbd>1</kbd> applies a gaussian filter on the image
