@@ -1,7 +1,12 @@
 # Click Notochord Cells
-An application to annotate Notochord cell locations 
+A python application to annotate Notochord cell locations 
 
 ### Getting started
+
+```
+import SelectApp
+SelectApp()
+```
 
 ### controls
 * `left click` adds a location.

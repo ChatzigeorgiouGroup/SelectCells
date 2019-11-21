@@ -13,25 +13,25 @@ import os
 from skimage import filters
 from skimage import exposure
 
-class Main:
+class SelectApp:
     def __init__(self, path = "./"):
         
         self.current_image = 0
         self.path = path
         
         self.result_dir = os.path.join(self.path, "cell_locations")
-        if not os.path.exists(self.result_dir):
-            os.mkdir(self.result_dir)
-        
-        
         self.images = self.get_images(self.path)
-        self.select_cells()
+        if len(self.images)>0:
+            self.select_cells()
+        else:
+            print("No valid files in path")
         
 
     def get_images(self, path = "./"):
-        present_results = os.listdir(self.result_dir)
         data = glob.glob(os.path.join(path, "**/**.tif"), recursive = True)
-        data = [x for x in data if os.path.split(x)[-1].rstrip(".tif") not in present_results]
+        if os.path.exists(self.result_dir):
+            present_results = os.listdir(self.result_dir)
+            data = [x for x in data if os.path.split(x)[-1].rstrip(".tif") not in present_results]
         return data
     
     def load_image(self):
@@ -51,6 +51,8 @@ class Main:
         self.clicker = Clicker(self, self.image)
         
     def save_results(self, locations, fig):
+        if not os.path.exists(self.result_dir):
+            os.mkdir(self.result_dir)       
         if not os.path.exists(self.savedir):
             os.mkdir(self.savedir)
         fig.savefig(os.path.join(self.savedir, "locations.png"))
@@ -147,5 +149,5 @@ class Clicker:
             self.update()
 
 if __name__ == "__main__":
-   m = Main()
+   SelectApp()
 
