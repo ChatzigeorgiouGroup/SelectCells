@@ -13,6 +13,7 @@ import os
 from skimage import filters
 from skimage import exposure
 import pandas as pd
+from SelectionTools import CellSelector, ContourFinder
 
 class SelectApp:
     def __init__(self, path = "./"):
@@ -24,6 +25,15 @@ class SelectApp:
         self.images = self.get_images(self.path)
         if len(self.images)>0:
             print(f"Found {len(self.images)} to annotate\n")
+            self.state = input("Select NotochordCells [n] or Contours [c]: ")
+            if self.state.lower() == "n":
+                self.state = 0
+                self.f = CellSelector
+            elif self.state.lower() == "c":
+                self.state = 1
+                self.f = ContourFinder
+            else:
+                print("invalid option specified.")
             self.select_cells()
         else:
             print("\nNo valid files in path")
@@ -41,7 +51,7 @@ class SelectApp:
         self.savedir = os.path.join(self.result_dir, os.path.split(path)[-1].rstrip(".tif"))
         print(f"Loading image {os.path.split(path)[-1]}")
         img = tifffile.imread(path).T
-        img = np.max(img[0], axis = 0)
+        img = np.max(img[self.state], axis = 0)
         return img
         
     def next_image(self, step = 1):
@@ -50,7 +60,7 @@ class SelectApp:
         
     def select_cells(self):
         self.image = self.load_image()
-        self.clicker = Clicker(self, self.image)
+        self.clicker = self.f(self, self.image)
         
     def save_results(self, locations, fig):
         if not os.path.exists(self.result_dir):
@@ -62,96 +72,10 @@ class SelectApp:
         df.to_csv(os.path.join(self.savedir, "locations.txt"), sep = "\t")
         print(f"saved results to {self.savedir}")
 
-class Clicker:
-    def __init__(self, parent, image):     
-        self.fig, self.ax = plt.subplots(figsize = (8,8))
-        self.original = image
-        self.image = image
-        self.parent = parent
-        self.image_canvas = self.ax.imshow(self.image, cmap = "gray")
-        self.fig.canvas.mpl_connect("button_press_event", self.mouseclick)
-        self.fig.canvas.mpl_connect("key_press_event", self.keypress)
-        self.locations = {}
-        self.cell_number = 1
-        self.ax.set_title(f"Next Cell Number: {self.cell_number}")
-        plt.show()
-        
-    def mouseclick(self, event):
-        if event.xdata:
-            x = int(event.xdata)
-            y = int(event.ydata)
-            if event.button == 1:
-                self.locations[self.cell_number] = np.array([x,y])
-                self.cell_number += 1
-           
-            elif event.button == 3:
-                cursor = np.array([x,y])
-                for loc in self.locations.keys():
-                    if np.linalg.norm(self.locations[loc] - cursor) < 5:
-                        self.locations.pop(loc)
-                        break
-                
-            self.draw_circle_artists()
-            self.ax.set_title(f"Next Cell Number: {self.cell_number}")
-            self.image_canvas.autoscale()
-            self.fig.canvas.draw()
-            self.remove_circle_artists()
-    
-    def update(self):
-        self.image_canvas.set_array(self.image)
-        self.image_canvas.autoscale()
-        self.draw_circle_artists()
-        self.ax.set_title(f"Next Cell Number: {self.cell_number}")
-        self.fig.canvas.draw()
-        self.remove_circle_artists()
-        
-    def draw_circle_artists(self, color = "r", fill = False):
-        self.artists = []
-        for loc in self.locations.keys():
-            circle = plt.Circle(self.locations[loc], 5, edgecolor = color, facecolor = None, fill = fill)
-            x, y = self.locations[loc]
-            text = plt.text(x+10, y, s = str(loc), color = color)
-            self.artists.append(circle)
-            self.artists.append(text)
-            self.ax.add_artist(circle)  
-            
-    def remove_circle_artists(self):
-        for artist in self.artists:
-            artist.remove()
-            
-    def keypress(self, event):
-        if event.key == "right":
-            plt.close(self.fig)
-            self.parent.next_image(step = 1)
-        if event.key == "left":
-            plt.close(self.fig)
-            self.parent.next_image(step = -1)
-        if event.key == "r":
-            self.locations = {}
-            self.image = self.original
-            self.cell_number = 1
-            self.update()
-        if event.key == "1":
-            self.image = filters.gaussian(self.image, sigma = 1)
-            self.update()
-        if event.key == "2":
-            self.image = exposure.adjust_gamma(self.image, gamma = 0.9)
-            self.update()
-        if event.key == "3":
-            self.image = exposure.adjust_gamma(self.image, gamma = 1.1)
-            self.update()
-        if event.key == "enter":
-            self.draw_circle_artists(color = "cyan", fill = True)
-            self.parent.save_results(self.locations, self.fig)
-            self.remove_circle_artists()
-        if event.key == "+":
-            self.cell_number += 1
-            self.update()
-        if event.key == "-":
-            self.cell_number -= 1
-            self.update()
+
 
 if __name__ == "__main__":
-    path = input("Path to tiffs:")
+#    path = input("Path to tiffs:")
+    path = "/home/daniel/Documents/Projects/Skeletonizing_Notochord/"
     app = SelectApp(path)
 

@@ -102,8 +102,7 @@ class CellSelector:
             
 class ContourFinder:
     def __init__(self, parent, image, *args, **kwargs):
-        self.fig = parent.fig
-        self.ax =  parent.ax
+        self.fig, self.ax = plt.subplots()
         self.original = image
         self.image = image
         self.parent = parent
@@ -132,18 +131,18 @@ class ContourFinder:
             self.image = self.image > filters.threshold_li(self.image)
             self.update()
         if event.key == "1":
-            self.image = filters.gaussian(self.image, sigma = 5)
+            self.image = filters.gaussian(self.image, sigma = 10)
             self.update()
         if event.key == "2":
-            self.image = exposure.adjust_gamma(self.image, gamma = 0.9)
+            self.image = exposure.adjust_gamma(self.image, gamma = 0.2)
             self.update()
         if event.key == "3":
-            self.image = exposure.adjust_gamma(self.image, gamma = 1.1)
+            self.image = exposure.adjust_gamma(self.image, gamma = 1.5)
 #            self.image = exposure.rescale_intensity(self.image, out_range = (np.percentile(self.image, 15),np.percentile(self.image, 95)))
             self.update()
-        if event.key == "enter":
-            self.parent.save_results(self.contours, self.fig)
-    
+#        if event.key == "enter":
+#            self.parent.save_results(self.contours, self.fig)
+#    
     def mouseclick(self, event):
         if event.xdata:
             x = int(event.xdata)
