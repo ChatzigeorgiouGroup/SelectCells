@@ -7,11 +7,8 @@ Created on Tue Nov 19 09:40:41 2019
 """
 import tifffile
 import numpy as np
-import matplotlib.pyplot as plt
 import glob
 import os
-from skimage import filters
-from skimage import exposure
 import pandas as pd
 from SelectionTools import CellSelector, ContourFinder
 

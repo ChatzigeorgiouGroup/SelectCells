@@ -111,6 +111,8 @@ class ContourFinder:
         self.fig.canvas.mpl_connect("key_press_event", self.keypress)
         self.skeleton = {}
         self.contours = {}
+        self.selected_contours = []
+        self.closest_ind = -1
         plt.show()
     
     def keypress(self, event):
@@ -138,7 +140,6 @@ class ContourFinder:
             self.update()
         if event.key == "3":
             self.image = exposure.adjust_gamma(self.image, gamma = 1.5)
-#            self.image = exposure.rescale_intensity(self.image, out_range = (np.percentile(self.image, 15),np.percentile(self.image, 95)))
             self.update()
 #        if event.key == "enter":
 #            self.parent.save_results(self.contours, self.fig)
@@ -147,31 +148,44 @@ class ContourFinder:
         if event.xdata:
             x = int(event.xdata)
             y = int(event.ydata)
-            if event.button == 1:
-                dists = []
+            dists = []
+            if len(self.contours.keys()) > 0:
                 for loc in self.contours.keys():
                     dists.append(np.linalg.norm(self.contours[loc] - np.array([y,x]), axis = 1).min())
-                self.ax.set_title(f"closest_skeleton: {np.argmin(dists)}")
-                self.fig.canvas.draw()
-                
-                
+                self.closest_ind = np.argmin(dists)
+            if event.button == 1:
+                self.selected_contours.append(self.closest_ind)
+            if event.button == 3:
+                if self.closest_ind in self.selected_contours:
+                    self.selected_contours.remove(self.closest_ind)
+            self.update()
+                    
+                    
     def update(self):
         self.ax.clear()
         self.image_canvas = self.ax.imshow(self.image, cmap = "gray")
         self.draw_contours()
+        if self.closest_ind != -1:
+            self.ax.set_title(f"Selected Skeleton: {self.closest_ind}")
         self.fig.canvas.draw()
   
     def find_contours(self, level = 0.8):
 #        imt = self.image > filters.threshold_li(self.image)
-        image = exposure.adjust_gamma(self.image, 0.2)
-        image = filters.gaussian(image, 10)
-        image = image > filters.threshold_li(image)
+#        image = exposure.adjust_gamma(self.image, 0.2)
+#        image = filters.gaussian(image, 10)
+        image = self.image > filters.threshold_li(self.image)
         contours = find_contours(image, 0.8)
         for i, c in enumerate(contours):
             self.contours[i] = c
         
     def draw_contours(self):
         for loc in self.contours.keys():
+            if loc in self.selected_contours:
+                ls = "solid"
+                alpha = .9
+            else:
+                ls = "dotted"
+                alpha = .6
             contour = self.contours[loc]
-            self.ax.plot(contour[:,1], contour[:,0], label = loc)
+            self.ax.plot(contour[:,1], contour[:,0], label = loc, alpha = alpha, ls = ls)
         self.ax.legend()           
