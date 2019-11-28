@@ -113,6 +113,7 @@ class ContourFinder:
         self.contours = {}
         self.selected_contours = []
         self.closest_ind = -1
+        self.artists = []
         plt.show()
     
     def keypress(self, event):
@@ -158,21 +159,33 @@ class ContourFinder:
             if event.button == 3:
                 if self.closest_ind in self.selected_contours:
                     self.selected_contours.remove(self.closest_ind)
-            self.update()
                     
+            if event.button == 2:
+                if self.closest_ind != -1 and len(self.contours) > 0:
+                    self.artists = []
+                    self.cut_mark = None
+                    distances = np.linalg.norm(self.contours[self.closest_ind] - np.array([y,x]), axis = 1)
+                    if distances.min() < 5:
+                        closest_point = np.argmin(distances)
+                        self.cut_mark = self.contours[self.closest_ind][closest_point]
+                        self.artists.append(plt.Circle((self.cut_mark[1],self.cut_mark[0]), radius = 5, edgecolor = "red", facecolor = "red"))
+            self.update()
+
                     
     def update(self):
         self.ax.clear()
         self.image_canvas = self.ax.imshow(self.image, cmap = "gray")
-        self.draw_contours()
+        if len(self.contours.keys()) > 0:
+            self.draw_contours()
         if self.closest_ind != -1:
             self.ax.set_title(f"Selected Skeleton: {self.closest_ind}")
+        for artist in self.artists:
+            self.ax.add_artist(artist)
         self.fig.canvas.draw()
+        for artist in self.artists:
+            artist.remove()
   
     def find_contours(self, level = 0.8):
-#        imt = self.image > filters.threshold_li(self.image)
-#        image = exposure.adjust_gamma(self.image, 0.2)
-#        image = filters.gaussian(image, 10)
         image = self.image > filters.threshold_li(self.image)
         contours = find_contours(image, 0.8)
         for i, c in enumerate(contours):
