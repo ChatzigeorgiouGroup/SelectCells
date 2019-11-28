@@ -114,6 +114,7 @@ class ContourFinder:
         self.selected_contours = []
         self.closest_ind = -1
         self.artists = []
+        self.cut_mark = None
         plt.show()
     
     def keypress(self, event):
@@ -142,6 +143,9 @@ class ContourFinder:
         if event.key == "3":
             self.image = exposure.adjust_gamma(self.image, gamma = 1.5)
             self.update()
+        if event.key == "x":
+            self.make_skeleton()
+#            self.update()
 #        if event.key == "enter":
 #            self.parent.save_results(self.contours, self.fig)
 #    
@@ -155,7 +159,10 @@ class ContourFinder:
                     dists.append(np.linalg.norm(self.contours[loc] - np.array([y,x]), axis = 1).min())
                 self.closest_ind = np.argmin(dists)
             if event.button == 1:
-                self.selected_contours.append(self.closest_ind)
+                if self.closest_ind != -1:
+                    self.selected_contours.append(self.closest_ind)
+                    if len(self.selected_contours) > 2:
+                        self.selected_contours = self.selected_contours[1:]
             if event.button == 3:
                 if self.closest_ind in self.selected_contours:
                     self.selected_contours.remove(self.closest_ind)
@@ -169,6 +176,7 @@ class ContourFinder:
                         closest_point = np.argmin(distances)
                         self.cut_mark = self.contours[self.closest_ind][closest_point]
                         self.artists.append(plt.Circle((self.cut_mark[1],self.cut_mark[0]), radius = 5, edgecolor = "red", facecolor = "red"))
+                        self.cut_mark = closest_point
             self.update()
 
                     
@@ -201,4 +209,39 @@ class ContourFinder:
                 alpha = .6
             contour = self.contours[loc]
             self.ax.plot(contour[:,1], contour[:,0], label = loc, alpha = alpha, ls = ls)
-        self.ax.legend()           
+        self.ax.legend() 
+
+    def make_skeleton(self):
+        if len(self.selected_contours) > 0:
+            if len(self.selected_contours) == 1 and type(self.cut_mark) != type(None):
+                loc = self.selected_contours[0]
+                contour1 = self.contours[loc][:self.cut_mark]
+                contour2 = self.contours[loc][self.cut_mark:]
+            else:
+                contour1 = self.contours[self.selected_contours[0]]
+                contour2 = self.contours[self.selected_contours[1]]
+            print(len(contour1))
+        self.ax.clear()
+        self.image_canvas = self.ax.imshow(self.image, cmap = "gray")
+        for i, c in enumerate([contour1, contour2]):
+            self.ax.plot(c[:,1], c[:,0], label = f"contour{i}")
+        self.ax.legend()
+        self.fig.canvas.draw()
+        
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
