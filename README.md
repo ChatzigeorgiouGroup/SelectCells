@@ -44,5 +44,7 @@ although on some installations this results in an event-loop error.
 * <kbd>r</kbd> resets all results and editing for the current image.
 
 For contour finding, blur the image and adjust the gamma to ensure smooth outlines. The contour finding will threshold the image behind the scenes and return the contours found in the thresholded image. Select the top and bottom contour of the animal, or if there is only one contour around the whole animal, select that contour and place a cut mark at the tail tip. 
-| --- | --- |
+
+|Example with a cutmark|Example with two skeletons|
+|:--------------------:|:------------------------:|
 | ![example image cut mark](./examples/contour_cutmark.png) | ![example image cut mark](./examples/contour_top_bottom.png) |
