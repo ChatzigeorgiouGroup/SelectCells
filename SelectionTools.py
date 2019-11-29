@@ -236,7 +236,7 @@ class ContourFinder:
             os.mkdir(self.parent.savedir)
         self.fig.savefig(os.path.join(self.parent.savedir, "contours.png"))
         for i,c in enumerate(self.contours_to_save):
-            np.save(f"contour{i}.npy", c)
+            np.save(os.path.join(self.parent.savedir, f"contour{i}.npy"), c)
         print(f"Results saved in {self.parent.savedir}")
         
             
