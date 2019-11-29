@@ -19,6 +19,8 @@ class SelectApp:
         self.path = path
         
         self.result_dir = os.path.join(self.path, "cell_locations")
+        if not os.path.exists(self.result_dir):
+            os.mkdir(self.result_dir) 
         self.images = self.get_images(self.path)
         if len(self.images)>0:
             print(f"Found {len(self.images)} to annotate\n")
@@ -60,8 +62,6 @@ class SelectApp:
         self.clicker = self.f(self, self.image)
         
     def save_results(self, locations, fig):
-        if not os.path.exists(self.result_dir):
-            os.mkdir(self.result_dir)       
         if not os.path.exists(self.savedir):
             os.mkdir(self.savedir)
         fig.savefig(os.path.join(self.savedir, "locations.png"))

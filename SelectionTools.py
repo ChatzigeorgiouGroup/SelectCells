@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from skimage import filters, exposure
 from skimage.measure import find_contours
+import os
 
 class CellSelector:
     def __init__(self, parent, image, *args, **kwargs):     
@@ -146,8 +147,8 @@ class ContourFinder:
         if event.key == "x":
             self.make_skeleton()
 #            self.update()
-#        if event.key == "enter":
-#            self.parent.save_results(self.contours, self.fig)
+        if event.key == "enter":
+            self.save_results()
 #    
     def mouseclick(self, event):
         if event.xdata:
@@ -194,8 +195,8 @@ class ContourFinder:
             artist.remove()
   
     def find_contours(self, level = 0.8):
-        image = self.image > filters.threshold_li(self.image)
-        contours = find_contours(image, 0.8)
+        self.image_t = self.image > filters.threshold_li(self.image)
+        contours = find_contours(self.image_t, 0.8)
         for i, c in enumerate(contours):
             self.contours[i] = c
         
@@ -220,14 +221,24 @@ class ContourFinder:
             else:
                 contour1 = self.contours[self.selected_contours[0]]
                 contour2 = self.contours[self.selected_contours[1]]
-            print(len(contour1))
+        self.contours_to_save = [contour1, contour2]     
         self.ax.clear()
         self.image_canvas = self.ax.imshow(self.image, cmap = "gray")
         for i, c in enumerate([contour1, contour2]):
             self.ax.plot(c[:,1], c[:,0], label = f"contour{i}")
+#        self.ax.plot(self.skeleton[:,1], self.skeleton[:,0], color = "lightgreen", label = "skeleton")
         self.ax.legend()
         self.fig.canvas.draw()
+    
+    def save_results(self):
+        if not os.path.exists(self.parent.savedir):
+            os.mkdir(self.parent.savedir)
+        self.fig.savefig(os.path.join(self.parent.savedir, "contours.png"))
+        for i,c in enumerate(self.contours_to_save):
+            np.save(f"contour{i}.npy", c)
+        print(f"Results saved in {self.parent.savedir}")
         
+            
             
             
             
