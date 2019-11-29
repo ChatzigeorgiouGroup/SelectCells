@@ -193,6 +193,7 @@ class ContourFinder:
         self.fig.canvas.draw()
         for artist in self.artists:
             artist.remove()
+
   
     def find_contours(self, level = 0.8):
         self.image_t = self.image > filters.threshold_li(self.image)

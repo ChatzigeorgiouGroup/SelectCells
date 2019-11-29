@@ -72,7 +72,7 @@ class SelectApp:
 
 
 if __name__ == "__main__":
-#    path = input("Path to tiffs:")
-    path = "/home/daniel/Documents/Projects/Skeletonizing_Notochord/"
+    path = input("Path to tiffs:")
+#    path = "/home/daniel/Documents/Projects/Skeletonizing_Notochord/"
     app = SelectApp(path)
 
