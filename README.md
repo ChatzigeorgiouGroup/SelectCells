@@ -33,7 +33,8 @@ although on some installations this results in an event-loop error.
 ### controls for Contour Selecting
 * 'left click' adds a contour to selection.
 * 'right click' removes a contour from selection.
-* 'middle click' adds a marker to a skeleton indicating where it will be cut if this is the only selected contour..
+* 'middle click' adds a marker to a skeleton indicating where it will be cut if this is the only selected contour.
+* <kbd>left</kbd> and <kbd>right</kbd> open next/previous images from the loaded list.
 * <kbd>1</kbd> applies a generous gaussian filter.
 * <kbd>2</kbd> adjusts the gamma with gamma = 0.2.
 * <kbd>3</kbd> adjusts the gamma with gamma = 1.5.
@@ -43,5 +44,5 @@ although on some installations this results in an event-loop error.
 * <kbd>r</kbd> resets all results and editing for the current image.
 
 For contour finding, blur the image and adjust the gamma to ensure smooth outlines. The contour finding will threshold the image behind the scenes and return the contours found in the thresholded image. Select the top and bottom contour of the animal, or if there is only one contour around the whole animal, select that contour and place a cut mark at the tail tip. 
-
-|![example image cut mark](./examples/contour_cutmark.png) |![example image cut mark](./examples/contour_top_bottom.png)|
+| --- | --- |
+| ![example image cut mark](./examples/contour_cutmark.png) | ![example image cut mark](./examples/contour_top_bottom.png) |
