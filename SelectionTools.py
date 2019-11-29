@@ -208,7 +208,7 @@ class ContourFinder:
                 alpha = .9
             else:
                 ls = "dotted"
-                alpha = .6
+                alpha = .7
             contour = self.contours[loc]
             self.ax.plot(contour[:,1], contour[:,0], label = loc, alpha = alpha, ls = ls)
         self.ax.legend() 
